@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+    <string name="title_activity_movie">MovieActivity</string>
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_title">PopularMovies Settings</string>
+
+
+    <!-- Strings For Order-By Preference [CHAR LIMIT=30] -->
+    <string name="settings_order_by_label">Order By</string>
+    <string name="settings_order_by_key" translatable="false">order_by</string>
+    <string name="settings_order_by_default_label">@string/settings_order_by_most_popular_label</string>
+    <string name="settings_order_by_default" translatable="false">@string/settings_order_by_most_popular_value</string>
+
+
+
+    <!-- Label for order-by most popular [CHAR LIMIT=20] -->
+    <string name="settings_order_by_most_popular_label">Most Popular</string>
+    <string name="settings_order_by_most_popular_value" translatable="false">popular</string>
+
+    <!-- Label for order-by highest rated [CHAR LIMIT=20] -->
+    <string name="settings_order_by_highest_rated_label">Top Rated</string>
+    <string name="settings_order_by_highest_rated_value" translatable="false">top_rated</string>
+
+    <!-- Label for order-by highest rated [CHAR LIMIT=20] -->
+    <string name="settings_order_by_now_playing_label">On Theatres</string>
+    <string name="settings_order_by_now_playing_value" translatable="false">now_playing</string>
+
+    <!-- Label for order-by highest rated [CHAR LIMIT=20] -->
+    <string name="settings_order_by_upcoming_label">Upcoming</string>
+    <string name="settings_order_by_upcoming_value" translatable="false">upcoming</string>
+    <string name="release_date">Release Date:</string>
+    <string name="vote_average">Vote average:</string>
+    <string name="plot_synopsis">Plot/ synopsis:</string>
+</resources>
