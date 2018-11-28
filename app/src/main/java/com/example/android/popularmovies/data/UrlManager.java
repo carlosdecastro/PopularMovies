@@ -9,4 +9,5 @@ public class UrlManager {
     public static final String KEY = "";
     static final String MOVIE_VIDEOS = "movie/{id}/videos";
     static final String MOVIE_REVIEWS = "movie/{id}/reviews";
+
 }
