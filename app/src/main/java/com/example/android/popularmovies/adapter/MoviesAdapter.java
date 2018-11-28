@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.R;
+import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.util.Helper;
 import com.squareup.picasso.Picasso;
 
@@ -23,6 +23,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     private List<Movie> mData;
     private LayoutInflater mInflater;
     private ListItemClickListener mOnClickListener;
+
 
     public interface ListItemClickListener {
         void onListItemClick (int clickedItemIndex);
@@ -55,8 +56,16 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
 
+    public void setMovies(List<Movie> movies) {
+        mData = movies;
+        notifyDataSetChanged();
+    }
+
+
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView poster;
+
+        private ImageView poster;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -67,6 +76,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
+            //int elementId = mData.get(getAdapterPosition()).getId();
+
             mOnClickListener.onListItemClick(clickedPosition);
         }
     }

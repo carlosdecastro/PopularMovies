@@ -13,7 +13,8 @@ public class MovieAPI {
                 new OkHttpClient.Builder()
                         .connectTimeout(10, TimeUnit.SECONDS)
                         .writeTimeout(10, TimeUnit.SECONDS)
-                        .readTimeout(20, TimeUnit.SECONDS)
+                        //.readTimeout(20, TimeUnit.SECONDS)
+                        .readTimeout(10, TimeUnit.SECONDS)
                         .retryOnConnectionFailure(true)
                         .build();
 

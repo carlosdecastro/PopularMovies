@@ -1,23 +1,37 @@
 package com.example.android.popularmovies.model;
 
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.List;
-
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 // This class defines the objects Movie, we use the third party library retrofit wit Gson for parse the json information.
 // We implements Parcelable because it has better performance passing objects throw activities
 
+@Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
     @SerializedName("vote_count")
     private Integer mVoteCount;
 
-    @SerializedName("id")
-    private Integer mId;
+    @Ignore
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     @SerializedName("video")
     private Boolean mVideo;
@@ -39,9 +53,9 @@ public class Movie implements Parcelable {
 
     @SerializedName("original_title")
     private String mOriginalTitle;
-
-    @SerializedName("genre_ids")
-    private List<Integer> mGenreIds = null;
+    @PrimaryKey
+    @SerializedName("id")
+    private Integer mId;
 
     @SerializedName("backdrop_path")
     private String mBackdropPath;
@@ -54,8 +68,27 @@ public class Movie implements Parcelable {
 
     @SerializedName("release_date")
     private String mReleaseDate;
+    @Ignore
+    @SerializedName("genre_ids")
+    private List<Integer> mGenreIds = null;
 
+    public Movie(Integer mVoteCount, Integer mId, Boolean mVideo, Float mVoteAverage, String mTitle, Float mPopularity, String mPosterPath, String mOriginalLanguage, String mOriginalTitle, String mBackdropPath, Boolean mAdult, String mOverview, String mReleaseDate) {
+        this.mVoteCount = mVoteCount;
+        this.mId = mId;
+        this.mVideo = mVideo;
+        this.mVoteAverage = mVoteAverage;
+        this.mTitle = mTitle;
+        this.mPopularity = mPopularity;
+        this.mPosterPath = mPosterPath;
+        this.mOriginalLanguage = mOriginalLanguage;
+        this.mOriginalTitle = mOriginalTitle;
+        this.mBackdropPath = mBackdropPath;
+        this.mAdult = mAdult;
+        this.mOverview = mOverview;
+        this.mReleaseDate = mReleaseDate;
+    }
 
+    @Ignore
     private Movie(Parcel in) {
 
         if (in.readByte() == 0) {
@@ -97,6 +130,7 @@ public class Movie implements Parcelable {
         mAdult = tmpAdult == 0 ? null : tmpAdult == 1;
     }
 
+    @Ignore
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
@@ -140,22 +174,11 @@ public class Movie implements Parcelable {
         dest.writeByte((byte) (mAdult == null ? 0 : mAdult ? 1 : 2));
     }
 
+    @Ignore
     @Override
     public int describeContents() {
         return 0;
     }
-
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel in) {
-            return new Movie(in);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
 
     public Integer getVoteCount() {
         return mVoteCount;
@@ -211,6 +234,62 @@ public class Movie implements Parcelable {
 
     public String getReleaseDate() {
         return mReleaseDate;
+    }
+
+    public void setmVoteCount(Integer mVoteCount) {
+        this.mVoteCount = mVoteCount;
+    }
+
+    public void setmId(Integer mId) {
+        this.mId = mId;
+    }
+
+    public void setmVideo(Boolean mVideo) {
+        this.mVideo = mVideo;
+    }
+
+    public void setmVoteAverage(Float mVoteAverage) {
+        this.mVoteAverage = mVoteAverage;
+    }
+
+    public void setmTitle(String mTitle) {
+        this.mTitle = mTitle;
+    }
+
+    public void setmPopularity(Float mPopularity) {
+        this.mPopularity = mPopularity;
+    }
+
+    public void setmPosterPath(String mPosterPath) {
+        this.mPosterPath = mPosterPath;
+    }
+
+    public void setmOriginalLanguage(String mOriginalLanguage) {
+        this.mOriginalLanguage = mOriginalLanguage;
+    }
+
+    public void setmOriginalTitle(String mOriginalTitle) {
+        this.mOriginalTitle = mOriginalTitle;
+    }
+
+    public void setmGenreIds(List<Integer> mGenreIds) {
+        this.mGenreIds = mGenreIds;
+    }
+
+    public void setmBackdropPath(String mBackdropPath) {
+        this.mBackdropPath = mBackdropPath;
+    }
+
+    public void setmAdult(Boolean mAdult) {
+        this.mAdult = mAdult;
+    }
+
+    public void setmOverview(String mOverview) {
+        this.mOverview = mOverview;
+    }
+
+    public void setmReleaseDate(String mReleaseDate) {
+        this.mReleaseDate = mReleaseDate;
     }
 
 }

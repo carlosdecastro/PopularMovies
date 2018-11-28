@@ -1,11 +1,14 @@
 package com.example.android.popularmovies;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -13,14 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.adapter.MoviesAdapter;
-
 import com.example.android.popularmovies.data.MovieAPI;
 import com.example.android.popularmovies.data.MovieRestAdapter;
 import com.example.android.popularmovies.data.UrlManager;
-
 import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.model.Movies;
 
@@ -34,17 +36,26 @@ import retrofit2.Retrofit;
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.ListItemClickListener {
 
     private RecyclerView moviesRv;
+    private Movies data = null;
     private List<Movie> movies;
     private MoviesAdapter moviesAdapter;
+    private ProgressBar progressBar;
+    private RelativeLayout messageLayout;
+    private TextView emptyTitleText;
+    private TextView emptySubtitleText;
+    private ImageView emptyMovieImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final TextView infoTv = findViewById(R.id.tvInfo);
-        final ImageView errorIv = findViewById(R.id.ivError);
-        final ProgressBar progressBar = findViewById(R.id.loading_spinner);
+        progressBar = findViewById(R.id.loading_spinner);
+        emptyTitleText = findViewById(R.id.empty_title_text);
+        emptyMovieImage = findViewById(R.id.empty_movies_image);
+        emptySubtitleText = findViewById(R.id.empty_subtitle_text);
+        messageLayout = findViewById(R.id.empty_view);
+        messageLayout.setVisibility(View.GONE);
 
         moviesRv = findViewById(R.id.rvMovies);
 
@@ -54,53 +65,66 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
         // We initialises the sharedPreferences to read the default one
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String orderBy  = sharedPrefs.getString(
-                getString(R.string.settings_order_by_key),
-                getString(R.string.settings_order_by_default)
-        );
+        String orderBy = sharedPrefs.getString(getString(R.string.settings_order_by_key), getString(R.string.settings_order_by_default));
 
-        // We use the third party library Retrofit to managed the calls
-        // to the API and parsing the data.
-        Retrofit retrofit = MovieAPI.provideRetrofit();
 
-        final MovieRestAdapter movieRestAdapter = retrofit.create(MovieRestAdapter.class);
+        if (orderBy.equals(getString(R.string.settings_order_by_favorites_value))) {
+            setupViewModel();
 
-        // We use the object movieRestAdapter to make calls to the API
-        // The KEY is defined in data/UrlManager
-        Call<Movies> call = movieRestAdapter.getMoviesBy(orderBy, UrlManager.KEY);
+        } else {
 
-        call.enqueue(new Callback<Movies>() {
+            // We use the third party library Retrofit to managed the calls
+            // to the API and parsing the data.
+            Retrofit retrofit = MovieAPI.provideRetrofit();
 
-            @Override
-            public void onResponse(@NonNull Call<Movies> call, @NonNull Response<Movies> response) {
-                if (!response.isSuccessful()) {
-                    infoTv.setText(response.code());
-                    moviesRv.setVisibility(View.GONE);
+            final MovieRestAdapter movieRestAdapter = retrofit.create(MovieRestAdapter.class);
+
+            // We use the object movieRestAdapter to make calls to the API
+            // The KEY is defined in data/UrlManager
+            Call<Movies> call = movieRestAdapter.getMoviesBy(orderBy, UrlManager.KEY);
+
+            call.enqueue(new Callback<Movies>() {
+
+                @Override
+                public void onResponse(@NonNull Call<Movies> call, @NonNull Response<Movies> response) {
+                    if (!response.isSuccessful()) {
+                        emptyTitleText.setText(response.code());
+                        moviesRv.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
+                        return;
+                    }
+
                     progressBar.setVisibility(View.GONE);
-                    return;
+                    data = response.body();
+                    movies = data.getResults();
+                    //If everything is OK with the data we populated the adapter with it.
+                    setAdapter();
                 }
 
-                progressBar.setVisibility(View.GONE);
-                Movies data = response.body();
-                movies = data.getResults();
-                //If everything is OK with the data we populated the adapter with it.
-                setAdapter();
-            }
-
-
-            // If something wrong happens with the data we show the exception throw a textView
-            @Override
-            public void onFailure(@NonNull Call<Movies> call, @NonNull Throwable t) {
-                infoTv.setText(t.getMessage());
-                errorIv.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+                // If something wrong happens with the data we show the exception throw a textView
+                @Override
+                public void onFailure(@NonNull Call<Movies> call, @NonNull Throwable t) {
+                    //emptyTitleText.setText(t.getMessage());
+                    emptyTitleText.setText(getString(R.string.error_empty_title));
+                    emptySubtitleText.setText(R.string.error_empty_subtitle);
+                    progressBar.setVisibility(View.GONE);
+                    messageLayout.setVisibility(View.VISIBLE);
+                    emptyMovieImage.setImageResource(R.drawable.ic_wifi);
+                }
+            });
+        }
     }
 
     private void setAdapter() {
         moviesAdapter = new MoviesAdapter(getBaseContext(), movies, this);
         moviesRv.setAdapter(moviesAdapter);
+
+        if (movies.size() <= 0) {
+            messageLayout.setVisibility(View.VISIBLE);
+            emptyMovieImage.setImageResource(R.drawable.ic_film);
+            emptyTitleText.setText(getString(R.string.favorite_empty_title));
+            emptySubtitleText.setText(R.string.favorite_empty_subtitle);
+        }
     }
 
     @Override
@@ -126,4 +150,18 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void setupViewModel() {
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> data) {
+                movies = data;
+                progressBar.setVisibility(View.GONE);
+                setAdapter();
+                moviesAdapter.setMovies(data);
+            }
+        });
+    }
+
 }

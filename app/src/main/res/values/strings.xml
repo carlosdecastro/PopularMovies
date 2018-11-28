@@ -12,7 +12,6 @@
     <string name="settings_order_by_default" translatable="false">@string/settings_order_by_most_popular_value</string>
 
 
-
     <!-- Label for order-by most popular [CHAR LIMIT=20] -->
     <string name="settings_order_by_most_popular_label">Most Popular</string>
     <string name="settings_order_by_most_popular_value" translatable="false">popular</string>
@@ -28,7 +27,25 @@
     <!-- Label for order-by highest rated [CHAR LIMIT=20] -->
     <string name="settings_order_by_upcoming_label">Upcoming</string>
     <string name="settings_order_by_upcoming_value" translatable="false">upcoming</string>
+
+    <!-- Label for order-by highest rated [CHAR LIMIT=20] -->
+    <string name="settings_order_by_favorites_label">Favorites</string>
+    <string name="settings_order_by_favorites_value" translatable="false">favorites</string>
+
     <string name="release_date">Release Date:</string>
     <string name="vote_average">Vote average:</string>
     <string name="plot_synopsis">Plot/ synopsis:</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tab_1">Info</string>
+    <string name="tab_2">Trailers</string>
+    <string name="tab_3">Reviews</string>
+    <string name="favorite_empty_title">Your favorite list is empty</string>
+    <string name="favorite_empty_subtitle">Try adding some new films</string>
+    <string name="error_empty_title">Connection failed</string>
+    <string name="error_empty_subtitle">We cannot connect to themoviedb.org</string>
+    <string name="trailers_empty_subtitle">There is not trailer from this movie so far</string>
+    <string name="reviews_empty_subtitle">Nobody has written a review so far</string>
+    <string name="reviews_empty_title">No reviews</string>
+    <string name="trailers_empty_title">No trailers</string>
 </resources>
