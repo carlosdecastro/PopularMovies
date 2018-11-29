@@ -33,7 +33,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.ListItemClickListener {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.ListItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private RecyclerView moviesRv;
     private Movies data = null;
@@ -65,53 +65,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
         // We initialises the sharedPreferences to read the default one
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String orderBy = sharedPrefs.getString(getString(R.string.settings_order_by_key), getString(R.string.settings_order_by_default));
+        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
+        String orderBy = sharedPrefs.getString(getString(R.string.settings_order_by_key), getString(R.string.settings_order_by_default));
 
         if (orderBy.equals(getString(R.string.settings_order_by_favorites_value))) {
             setupViewModel();
-
         } else {
-
-            // We use the third party library Retrofit to managed the calls
-            // to the API and parsing the data.
-            Retrofit retrofit = MovieAPI.provideRetrofit();
-
-            final MovieRestAdapter movieRestAdapter = retrofit.create(MovieRestAdapter.class);
-
-            // We use the object movieRestAdapter to make calls to the API
-            // The KEY is defined in data/UrlManager
-            Call<Movies> call = movieRestAdapter.getMoviesBy(orderBy, UrlManager.KEY);
-
-            call.enqueue(new Callback<Movies>() {
-
-                @Override
-                public void onResponse(@NonNull Call<Movies> call, @NonNull Response<Movies> response) {
-                    if (!response.isSuccessful()) {
-                        emptyTitleText.setText(response.code());
-                        moviesRv.setVisibility(View.GONE);
-                        progressBar.setVisibility(View.GONE);
-                        return;
-                    }
-
-                    progressBar.setVisibility(View.GONE);
-                    data = response.body();
-                    movies = data.getResults();
-                    //If everything is OK with the data we populated the adapter with it.
-                    setAdapter();
-                }
-
-                // If something wrong happens with the data we show the exception throw a textView
-                @Override
-                public void onFailure(@NonNull Call<Movies> call, @NonNull Throwable t) {
-                    //emptyTitleText.setText(t.getMessage());
-                    emptyTitleText.setText(getString(R.string.error_empty_title));
-                    emptySubtitleText.setText(R.string.error_empty_subtitle);
-                    progressBar.setVisibility(View.GONE);
-                    messageLayout.setVisibility(View.VISIBLE);
-                    emptyMovieImage.setImageResource(R.drawable.ic_wifi);
-                }
-            });
+            getData(orderBy);
         }
     }
 
@@ -164,4 +125,65 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
         });
     }
 
+    private void getData(String orderBy) {
+        // We use the third party library Retrofit to managed the calls
+        // to the API and parsing the data.
+        Retrofit retrofit = MovieAPI.provideRetrofit();
+
+        final MovieRestAdapter movieRestAdapter = retrofit.create(MovieRestAdapter.class);
+
+        // We use the object movieRestAdapter to make calls to the API
+        // The KEY is defined in data/UrlManager
+        Call<Movies> call = movieRestAdapter.getMoviesBy(orderBy, UrlManager.KEY);
+
+        call.enqueue(new Callback<Movies>() {
+
+            @Override
+            public void onResponse(@NonNull Call<Movies> call, @NonNull Response<Movies> response) {
+                if (!response.isSuccessful()) {
+                    emptyTitleText.setText(response.code());
+                    moviesRv.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
+
+                progressBar.setVisibility(View.GONE);
+                data = response.body();
+                movies = data.getResults();
+                //If everything is OK with the data we populated the adapter with it.
+                setAdapter();
+            }
+
+            // If something wrong happens with the data we show the exception throw a textView
+            @Override
+            public void onFailure(@NonNull Call<Movies> call, @NonNull Throwable t) {
+                emptyTitleText.setText(getString(R.string.error_empty_title));
+                emptySubtitleText.setText(R.string.error_empty_subtitle);
+                progressBar.setVisibility(View.GONE);
+                messageLayout.setVisibility(View.VISIBLE);
+                emptyMovieImage.setImageResource(R.drawable.ic_wifi);
+            }
+        });
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        String orderBy = sharedPreferences.getString(getString(R.string.settings_order_by_key), getString(R.string.settings_order_by_default));
+        if (orderBy.equals(getString(R.string.settings_order_by_favorites_value))) {
+            setupViewModel();
+        } else {
+            moviesAdapter.clear();
+            messageLayout.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            getData(orderBy);
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+    }
 }

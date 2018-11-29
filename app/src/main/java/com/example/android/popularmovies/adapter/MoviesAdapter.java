@@ -61,6 +61,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        final int size = mData.size();
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                mData.remove(0);
+            }
+
+            notifyItemRangeRemoved(0, size);
+        }
+    }
+
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.MovieActivity;
@@ -37,15 +38,22 @@ public class MovieInfoFragment extends Fragment {
         TextView releaseDateTv = rootView.findViewById(R.id.origin_tv);
         TextView voteAverageTv = rootView.findViewById(R.id.also_known_tv);
         TextView plotSynopsisTv = rootView.findViewById(R.id.description_tv);
+        RatingBar ratingBar = rootView.findViewById(R.id.rating_tv);
 
         Picasso.with(getContext()).load(Helper.imageUrl(movie.getBackdropPath())).into(imageIv);
 
         releaseDateTv.setText(movie.getReleaseDate());
         voteAverageTv.setText(movie.getVoteAverage().toString());
+
+        ratingBar.setRating(calculateStarts(movie.getVoteAverage()));
         plotSynopsisTv.setText(movie.getOverview());
 
         return rootView;
 
+    }
+
+    public float calculateStarts(float value) {
+        return (value * 5) / 10;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.data;
 
+
 public class UrlManager {
 
     // Here is defined the url for the api call
